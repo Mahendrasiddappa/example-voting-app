@@ -35,7 +35,7 @@ jobs:
           chmod +x ./sysdig-cli-scanner
           
 
-          IMAGES=$(grep -r "image:" k8s-specifications/ | awk '{print $2}' | tr -d '"' | sort | uniq)
+          IMAGES=$(grep -r "image:" k8s-specifications/ | awk '{print $4}')
 
           echo "Found the following images to scan:"
           echo "$IMAGES"
