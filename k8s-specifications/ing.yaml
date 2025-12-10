@@ -1,0 +1,97 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: voteingress
+  namespace: default
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: Environment=dev,Team=test
+    alb.ingress.kubernetes.io/transforms.vote: >
+      [{
+        "Type": "url-rewrite",
+        "urlRewriteConfig": {
+        "rewrites": [
+        {
+         "Regex": "^/vote(.*)",
+          "Replace": "/$1"
+        }
+        ]
+        }
+      }]
+    alb.ingress.kubernetes.io/transforms.result: >
+      [{
+        "Type": "url-rewrite",
+        "urlRewriteConfig": {
+        "rewrites": [
+         {
+           "Regex": "^/result(.*)",
+           "Replace": "/$1"
+        }
+        ]
+        }
+      }]
+    alb.ingress.kubernetes.io/actions.vote: >-
+      {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"vote","servicePort":8080,"weight":100}]}}
+    alb.ingress.kubernetes.io/actions.result: >-
+      {"type":"forward","forwardConfig":{"targetGroups":[{"serviceName":"result","servicePort":8081,"weight":100}]}}
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /vote*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vote
+                port:
+                  name: use-annotation
+          - path: /result*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: result
+                port:
+                  name: use-annotation
+          - path: /static*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 8080
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vote
+                port:
+                  number: 8080
+          - path: /stylesheets*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: result
+                port:
+                  number: 8081
+          - path: /angular*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: result
+                port:
+                  number: 8081
+          - path: /socket*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: result
+                port:
+                  number: 8081
+          - path: /app*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: result
+                port:
+                  number: 8081
