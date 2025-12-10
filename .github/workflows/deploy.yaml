@@ -34,9 +34,24 @@ jobs:
           curl -LO "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/latest_linux_amd64/sysdig-cli-scanner"
           chmod +x ./sysdig-cli-scanner
           
-          # Run the scan
-          # --apiurl: defaults to US East. If you use Sysdig EU or another region, update this URL.
-          ./sysdig-cli-scanner --apiurl https://secure.sysdig.com/ --console-log ${{ env.IMAGE_NAME }}
+
+          IMAGES=$(grep -r "image:" k8s-specifications/ | awk '{print $2}' | tr -d '"' | sort | uniq)
+
+          echo "Found the following images to scan:"
+          echo "$IMAGES"
+
+          # 3. Loop through each image: Pull & Scan
+          for img in $IMAGES; do
+            echo "----------------------------------------------"
+            echo "Processing image: $img"
+            
+            echo "Pulling..."
+            docker pull "$img"
+            
+            echo "Scanning..."
+            ./sysdig-cli-scanner --apiurl https://us4.app.sysdig.com --console-log "$img" || exit 1
+          done
+
       # 3. Authenticate to AWS using OIDC
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
