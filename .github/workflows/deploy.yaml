@@ -1,0 +1,42 @@
+name: Deploy to Amazon EKS
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+
+permissions:
+  id-token: write   # Required for requesting the OIDC JWT Token
+  contents: read    # Required for actions/checkout
+
+jobs:
+  deploy:
+    name: Deploy to EKS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Authenticate to AWS using OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # 2. Get the kubeconfig so kubectl can talk to your cluster
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      # 3. Apply the manifests directly
+      - name: Deploy to EKS
+        run: |
+          # Apply the entire folder of manifests (e.g., k8s/) or a specific file
+          kubectl apply -f k8s/ 
+          
+          # Optional: Force a restart if you need to pull the latest version of a "latest" tag
+          # kubectl rollout restart deployment/vote-deployment
