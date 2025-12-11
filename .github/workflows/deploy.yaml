@@ -41,13 +41,13 @@ jobs:
           echo "$IMAGES"
 
           # 3. Loop through each image: Pull & Scan
-         grep -r "image:" k8s-specifications/ | awk '{print $4}' | while read img; do
-           echo "-------------------START---------------------------"
-           echo "Processing image: $img"
-           docker pull "$img"
-           echo "Scanning..."
-           ./sysdig-cli-scanner --apiurl https://us4.app.sysdig.com --console-log "$img" || exit 1
-         done
+          grep -r "image:" k8s-specifications/ | awk '{print $4}' | while read img; do
+            echo "-------------------START---------------------------"
+            echo "Processing image: $img"
+            docker pull "$img"
+            echo "Scanning..."
+            ./sysdig-cli-scanner --apiurl https://us4.app.sysdig.com --console-log "$img" || exit 1
+          done
 
       # 3. Authenticate to AWS using OIDC
       - name: Configure AWS credentials
