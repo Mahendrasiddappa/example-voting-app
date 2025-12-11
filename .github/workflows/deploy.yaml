@@ -40,7 +40,7 @@ jobs:
             echo "Processing image: $img"
             docker pull "$img"
             echo "Scanning..."
-            ./sysdig-cli-scanner --apiurl https://us4.app.sysdig.com --console-log "$img" || exit 1
+            ./sysdig-cli-scanner --apiurl https://app.us4.sysdig.com --console-log "$img" || exit 1
           done
 
       # 3. Authenticate to AWS using OIDC
