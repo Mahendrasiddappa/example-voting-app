@@ -21,9 +21,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      # 1. Pull the public image so it is available locally for scanning
-      - name: Pull Docker Image
-        run: docker pull ${{ env.IMAGE_NAME }}
 
       # 2. Download and Run Sysdig CLI Scanner
       - name: Sysdig Secure Image Scan
