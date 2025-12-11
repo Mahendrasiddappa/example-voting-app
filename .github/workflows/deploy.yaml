@@ -35,18 +35,11 @@ jobs:
           chmod +x ./sysdig-cli-scanner
           
 
-          IMAGES=$(grep -r "image:" k8s-specifications/ | awk '{print $4}')
-
-          echo "Found the following images to scan:"
-          echo "$IMAGES"
+          IMAGES="dockersamples/examplevotingapp_result postgres:15-alpine dockersamples/examplevotingapp_vote dockersamples/examplevotingapp_worker redis:alpine"
 
           # 3. Loop through each image: Pull & Scan
-          grep -r "image:" k8s-specifications/ | awk '{print $NF}' | tr -d '"' | tr -d '\r' | while read img; do
-            if [ -z "$img" ]; then
-              continue
-            fi
-            
-            echo "-------------------START---------------------------"
+          for img in $IMAGES; do  
+            echo "----------------------------------------------"
             echo "Processing image: $img"
             docker pull "$img"
             echo "Scanning..."
