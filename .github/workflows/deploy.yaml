@@ -25,8 +25,10 @@ jobs:
         env:
           SECURE_API_TOKEN: ${{ secrets.SYSDIG_SECURE_TOKEN }}
         run: |
-          # Download the scanner (same binary, different command)
-          # Note: If you already downloaded it in the Image Scan step, you don't need to curl it again.
+          # Download the latest version of the scanner
+          LATEST_VERSION=$(curl -L -s https://download.sysdig.com/scanning/sysdig-cli-scanner/latest_version.txt)
+          curl -LO "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/${LATEST_VERSION}/linux/amd64/sysdig-cli-scanner"
+          chmod +x ./sysdig-cli-scanner
           
           # Run the scan on the 'k8s-specifications' folder
           ./sysdig-cli-scanner \
@@ -39,10 +41,6 @@ jobs:
         env:
           SECURE_API_TOKEN: ${{ secrets.SYSDIG_SECURE_TOKEN }}
         run: |
-          # Download the latest version of the scanner
-          LATEST_VERSION=$(curl -L -s https://download.sysdig.com/scanning/sysdig-cli-scanner/latest_version.txt)
-          curl -LO "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/${LATEST_VERSION}/linux/amd64/sysdig-cli-scanner"
-          chmod +x ./sysdig-cli-scanner
 
           IMAGES="dockersamples/examplevotingapp_result postgres:15-alpine dockersamples/examplevotingapp_vote dockersamples/examplevotingapp_worker redis:alpine"
 
