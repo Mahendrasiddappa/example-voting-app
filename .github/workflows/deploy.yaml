@@ -42,6 +42,10 @@ jobs:
 
           # 3. Loop through each image: Pull & Scan
           grep -r "image:" k8s-specifications/ | awk '{print $NF}' | tr -d '"' | tr -d '\r' | while read img; do
+            if [ -z "$img" ]; then
+              continue
+            fi
+            
             echo "-------------------START---------------------------"
             echo "Processing image: $img"
             docker pull "$img"
