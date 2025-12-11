@@ -33,7 +33,8 @@ jobs:
           # Run the scan on the 'k8s-specifications' folder
           ./sysdig-cli-scanner --iac -r -f H \
             --apiurl https://app.us4.sysdig.com \
-            k8s-specifications/ 
+            k8s-specifications/ \
+            --console-log
 
       # Download and Run Sysdig CLI Scanner
       - name: Sysdig Secure Image Scan
